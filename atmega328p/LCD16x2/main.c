@@ -17,8 +17,8 @@
 
 void send_command(char command)
 {
-    char upper_half = command >> 4;
-    char lower_half = command & 0x0F;
+    const char upper_half = command >> 4;
+    const char lower_half = command & 0x0F;
 
     PORTD &= ~(1 << RS_PORT);
     PORTD &= ~(1 << RW_PORT);
@@ -70,7 +70,7 @@ void print_string(const char *str)
     }
 }
 
-void init_lcd()
+void init_lcd(void)
 {
     _delay_ms(15);
 

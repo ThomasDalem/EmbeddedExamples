@@ -3,6 +3,6 @@ default:
 	avr-gcc -mmcu=atmega328p -o I2C_receiver.bin I2C_receiver.o
 	avr-objcopy -O ihex -j .text -j .data -R .eeprom I2C_receiver.bin I2C_receiver.hex
 
-.PHONY: deploy
-deploy:
+.PHONY: flash
+flash:
 	avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:I2C_receiver.hex

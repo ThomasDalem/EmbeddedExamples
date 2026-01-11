@@ -6,6 +6,17 @@
 
 #define BAUDS 9600
 
+void i2c_init(void)
+{
+	TWAR = 0x20; // Address of the slave (receiver)
+	TWCR = (1 << TWEA) | (1 << TWEN);
+}
+
+void checkData(void)
+{
+	
+}
+
 int main(void)
 {
 	char buffer[12];
@@ -14,6 +25,7 @@ int main(void)
 
     while (1)
     {
+		checkData();
 		if (strcmp(buffer, "Hello world") == 0)
 		{
 			PORTB = PORTB | (1 << PORTB0);

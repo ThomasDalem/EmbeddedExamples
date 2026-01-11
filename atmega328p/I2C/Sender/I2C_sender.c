@@ -1,8 +1,7 @@
 #include <avr/io.h>
-#include <util/delay.h>
 #include <stdint.h>
 
-#define SCL_CLOCK 400000L
+#define SCL_CLOCK 50000L // 50 kHz
 #define F_CPU 16000000UL
 
 void i2c_init(void)
@@ -48,20 +47,4 @@ void i2c_send_string(char *str)
 		i2c_send_byte(*str);
 		str++;
 	}
-}
-
-int main(void)
-{
-	i2c_init();
-
-	while (1)
-	{
-		i2c_start();
-		i2c_address(0x20);
-		i2c_send_string("Hello world\n");
-		i2c_stop();
-		_delay_ms(1000);
-	}
-
-	return 0;
 }
