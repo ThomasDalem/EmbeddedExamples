@@ -10,7 +10,11 @@
 #define CMD_SET_INVERSE_DISPLAY 0xA7
 #define CMD_SET_DISPLAY_OFF 0xAE
 #define CMD_SET_DISPLAY_ON 0xAF
+// Memory addresing
 #define CMD_SET_MEMORY_ADDRESSING_MODE 0x20
+#define CMD_SET_MEMORY_ADDRESSING_MODE_HORIZONTAL 0x00
+#define CMD_SET_MEMORY_ADDRESSING_MODE_VERTICAL 0x01
+#define CMD_SET_MEMORY_ADDRESSING_MODE_PAGE 0x02
 #define CMD_SET_COLUMN_ADDRESS 0x21
 #define CMD_SET_PAGE_ADDRESS 0x22
 #define CMD_SET_SEGMENT_REMAP_NORMAL 0xA0
@@ -22,6 +26,7 @@
 #define CMD_SET_DISPLAY_OFFSET 0xD3
 #define CMD_SET_CHARGE_PUMP 0x8D
 #define CMD_SET_COMSCANDEC 0xC8
+#define CMD_SET_COMSCANINC 0xC0
 #define CMD_SET_COMPINS 0xDA
 #define CMD_SET_PRECHARGE 0xD9
 #define CMD_SET_VCOMDETECT 0xDB
@@ -31,8 +36,26 @@
 #define WIDTH 128
 #define HEIGHT 64
 
-void SSD1306_send_command(uint8_t command);
-void SSD1306_send_command_list(uint8_t *commands, uint8_t len);
-void SSD1306_display(char *buffer);
+#define OK 0
+#define ERR 1
+
+typedef struct screen_s {
+    char *buffer;
+    uint8_t address;
+    uint8_t width;
+    uint8_t height;
+} screen_t;
+
+int SSD1306_init_screen(screen_t *screen, uint8_t width, uint8_t heigth, uint8_t address);
+void SSD1306_send_command(uint8_t address, uint8_t command);
+void SSD1306_send_command_list(uint8_t address, uint8_t *commands, uint8_t len);
+void SSD1306_fill(screen_t *screen, uint8_t byte);
+void SSD1306_set_pixel(screen_t *screen, int x, int y);
+void SSD1306_clear(screen_t *screen);
+/**
+ * Sends the buffer to the screen.
+ * @param screen pointer to the screen structure containing the buffer
+ */
+void SSD1306_display(screen_t *screen);
 
 #endif

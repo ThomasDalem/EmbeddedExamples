@@ -8,7 +8,7 @@ lib:
 	avr-ar -r "libssd1306.a" SSD1306.o
 	avr-size --format=avr --mcu=atmega328p libssd1306.a
 
-flash:
+flash: default
 	avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyUSB0 -b 115200 -U flash:w:main.hex
 
 clean:
