@@ -46,9 +46,7 @@ int main(void)
 
     i2c_init();
 
-    _delay_ms(1000);
-
-    SSD1306_init_screen(&screen, 128, 64, 0x3C);
+    SSD1306_init_screen(&screen, 0x3C);
     init_screen(screen.address);
 
     _delay_ms(500);
@@ -56,7 +54,20 @@ int main(void)
     SSD1306_clear(&screen);
     SSD1306_display(&screen);
 
-    SSD1306_set_pixel(&screen, 127, 63);
+    for (int x = 30, y = 20; x < 40; x++, y++)
+    {
+        SSD1306_draw_pixel(&screen, x, y);
+    }
+    for (int x = 40, y = 20; x > 30; x--, y++)
+    {
+        SSD1306_draw_pixel(&screen, x, y);
+    }
+    SSD1306_draw_pixel(&screen, 127, 63);
+
+    pos_t p1 = {5, 5};
+    pos_t p2 = {25, 10};
+    SSD1306_draw_line(&screen, &p1, &p2);
+
     SSD1306_display(&screen);
 
     while (1)

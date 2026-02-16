@@ -3,23 +3,11 @@
 #include "SSD1306.h"
 #include "I2C.h"
 
-int SSD1306_init_screen(screen_t *screen, uint8_t width, uint8_t height, uint8_t address)
+void SSD1306_init_screen(screen_t *screen, uint8_t address)
 {
-    const uint16_t bufSize = screen->width * ((screen->height) / 8);
-    screen->buffer = malloc(sizeof(char) * bufSize);
+    memset(screen->buffer, 0, BUFFER_SIZE);
 
-    if (screen->buffer == NULL)
-    {
-        return ERR;
-    }
-
-    memset(screen->buffer, 0, bufSize);
-
-    screen->width = width;
-    screen->height = height;
     screen->address = address;
-
-    return OK;
 }
 
 void SSD1306_send_command(uint8_t address, uint8_t command)
@@ -54,19 +42,38 @@ void SSD1306_send_command_list(uint8_t address, uint8_t *commands, uint8_t len)
     i2c_stop();
 }
 
-void SSD1306_set_pixel(screen_t *screen, int x, int y)
+void SSD1306_draw_pixel(screen_t *screen, int x, int y)
 {
-    screen->buffer[x + (screen->width * (y / 8))] |= (1 << (y % 8));
+    screen->buffer[x + (WIDTH * (y / 8))] |= (1 << (y % 8));
+}
+
+void SSD1306_draw_line(screen_t *screen, const pos_t *p1, const pos_t *p2)
+{
+    int m_new = 2 * (p2->y - p1->y);
+    int slope_error_new = m_new - (p2->x - p1->x);
+    for (int x = p1->x, y = p1->y; x <= p2->x; x++) {
+        SSD1306_draw_pixel(screen, x, y);
+
+        // Add slope to increment angle formed
+        slope_error_new += m_new;
+
+        // Slope error reached limit, time to
+        // increment y and update slope error.
+        if (slope_error_new >= 0) {
+            y++;
+            slope_error_new -= 2 * (p2->x - p1->x);
+        }
+    }
 }
 
 void SSD1306_fill(screen_t *screen, uint8_t byte)
 {
-    memset(screen->buffer, byte, screen->width * ((screen->height + 7) / 8));
+    memset(screen->buffer, byte, WIDTH * ((HEIGHT) / 8));
 }
 
 void SSD1306_clear(screen_t *screen)
 {
-    memset(screen->buffer, 0, screen->width * ((screen->height + 7) / 8));
+    memset(screen->buffer, 0, WIDTH * ((HEIGHT) / 8));
 }
 
 void SSD1306_display(screen_t *screen)
@@ -76,16 +83,9 @@ void SSD1306_display(screen_t *screen)
     i2c_start();
     i2c_address(screen->address);
 
-    /* i2c_send_byte(CMD_SET_PAGE_ADDRESS);
-    i2c_send_byte(0);
-    i2c_send_byte(8 - 1);
-    i2c_send_byte(CMD_SET_COLUMN_ADDRESS);
-    i2c_send_byte(0);
-    i2c_send_byte(128 - 1); */
-
     i2c_send_byte(0x40);
 
-    for (uint32_t i = 0; i < screen->width * ((screen->height) / 8); i++)
+    for (uint32_t i = 0; i < WIDTH * ((HEIGHT) / 8); i++)
     {
         if (bytesOut >= I2C_MAX_BYTES)
         {

@@ -39,18 +39,28 @@
 #define OK 0
 #define ERR 1
 
-typedef struct screen_s {
-    char *buffer;
+#define WIDTH 128
+#define HEIGHT 64
+#define BUFFER_SIZE WIDTH * (HEIGHT / 8)
+
+typedef struct screen_s
+{
+    char buffer[BUFFER_SIZE];
     uint8_t address;
-    uint8_t width;
-    uint8_t height;
 } screen_t;
 
-int SSD1306_init_screen(screen_t *screen, uint8_t width, uint8_t heigth, uint8_t address);
+typedef struct pos_s
+{
+    uint8_t x;
+    uint8_t y;
+} pos_t;
+
+void SSD1306_init_screen(screen_t *screen, uint8_t address);
 void SSD1306_send_command(uint8_t address, uint8_t command);
 void SSD1306_send_command_list(uint8_t address, uint8_t *commands, uint8_t len);
 void SSD1306_fill(screen_t *screen, uint8_t byte);
-void SSD1306_set_pixel(screen_t *screen, int x, int y);
+void SSD1306_draw_pixel(screen_t *screen, int x, int y);
+void SSD1306_draw_line(screen_t *screen, const pos_t *p1, const pos_t *p2);
 void SSD1306_clear(screen_t *screen);
 /**
  * Sends the buffer to the screen.
